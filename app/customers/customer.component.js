@@ -12,6 +12,7 @@ var core_1 = require('@angular/core');
 // import { NgForm } from '@angular/forms';
 var forms_1 = require('@angular/forms');
 var customer_1 = require('./customer');
+require('rxjs/add/operator/debounceTime');
 // function ratingRange  (c: AbstractControl): {[key: string]: boolean} | null  {
 //         if (c.value !== undefined && (isNaN(c.value) || c.value < 1 || c.value > 5)) {
 //             return { 'range': true };
@@ -42,8 +43,13 @@ var CustomerComponent = (function () {
     function CustomerComponent(fb) {
         this.fb = fb;
         this.customer = new customer_1.Customer();
+        this.validationMessages = {
+            required: 'Please enter your email address.',
+            pattern: 'Please enter a valid email address.'
+        };
     }
     CustomerComponent.prototype.ngOnInit = function () {
+        var _this = this;
         this.customerForm = this.fb.group({
             firstName: ['', [forms_1.Validators.required, forms_1.Validators.minLength(3)]],
             lastName: ['', [forms_1.Validators.maxLength(30)]],
@@ -62,6 +68,13 @@ var CustomerComponent = (function () {
         //     email: new FormControl(),
         //     sendCatalog: new FormControl(true),
         // })
+        this.customerForm.get('notification').valueChanges
+            .subscribe(function (value) { console.log(value); _this.setNotification(value); });
+        var emailControl = this.customerForm.get('emailGroup.email');
+        emailControl.valueChanges.debounceTime(1000).subscribe(function (value) {
+            console.log('value change', value);
+            _this.setMessage(emailControl);
+        });
     };
     // save(customerForm: NgForm) {
     CustomerComponent.prototype.save = function () {
@@ -92,6 +105,19 @@ var CustomerComponent = (function () {
             phoneControl.clearValidators();
         }
         phoneControl.updateValueAndValidity();
+    };
+    CustomerComponent.prototype.setMessage = function (c) {
+        var _this = this;
+        this.emailMessage = '';
+        if ((c.touched || c.dirty) && c.errors) {
+            console.log('errors', c.errors);
+            this.emailMessage = Object.keys(c.errors).map(function (key) {
+                console.log('errors', c.errors);
+                console.log('msg', _this.validationMessages[key]);
+                return _this.validationMessages[key];
+            }).join(' ');
+            console.log('out msg', this.emailMessage);
+        }
     };
     CustomerComponent = __decorate([
         core_1.Component({
