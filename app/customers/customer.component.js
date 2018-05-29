@@ -12,17 +12,56 @@ var core_1 = require('@angular/core');
 // import { NgForm } from '@angular/forms';
 var forms_1 = require('@angular/forms');
 var customer_1 = require('./customer');
+// function ratingRange  (c: AbstractControl): {[key: string]: boolean} | null  {
+//         if (c.value !== undefined && (isNaN(c.value) || c.value < 1 || c.value > 5)) {
+//             return { 'range': true };
+//         };
+//         return null;
+//     };
+function ratingRange(min, max) {
+    return function (c) {
+        if (c.value !== undefined && (isNaN(c.value) || c.value < min || c.value > max)) {
+            return { 'range': true };
+        }
+        ;
+        return null;
+    };
+}
+function emailMatcher(c) {
+    var emailControl = c.get('email');
+    var confirmControl = c.get('confirmEmail');
+    if (emailControl.pristine || confirmControl.pristine) {
+        return null;
+    }
+    if (emailControl.value === confirmControl.value) {
+        return null;
+    }
+    return { 'match': true };
+}
 var CustomerComponent = (function () {
-    function CustomerComponent() {
+    function CustomerComponent(fb) {
+        this.fb = fb;
         this.customer = new customer_1.Customer();
     }
     CustomerComponent.prototype.ngOnInit = function () {
-        this.customerForm = new forms_1.FormGroup({
-            firstName: new forms_1.FormControl(),
-            lastName: new forms_1.FormControl(),
-            email: new forms_1.FormControl(),
-            sendCatalog: new forms_1.FormControl(true),
+        this.customerForm = this.fb.group({
+            firstName: ['', [forms_1.Validators.required, forms_1.Validators.minLength(3)]],
+            lastName: ['', [forms_1.Validators.maxLength(30)]],
+            sendCatalog: true,
+            phone: [''],
+            notification: ['email'],
+            rating: ['', [ratingRange(1, 5)]],
+            emailGroup: this.fb.group({
+                email: ['', [forms_1.Validators.required, forms_1.Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+')]],
+                confirmEmail: ['', forms_1.Validators.required]
+            }, { validator: emailMatcher })
         });
+        // this.customerForm =  new FormGroup({
+        //     firstName: new FormControl(),
+        //     lastName: new FormControl(),
+        //     email: new FormControl(),
+        //     sendCatalog: new FormControl(true),
+        // })
     };
     // save(customerForm: NgForm) {
     CustomerComponent.prototype.save = function () {
@@ -44,12 +83,22 @@ var CustomerComponent = (function () {
             email: "ansari@gmail.com"
         });
     };
+    CustomerComponent.prototype.setNotification = function (type) {
+        var phoneControl = this.customerForm.get('phone');
+        if (type == "text") {
+            phoneControl.setValidators(forms_1.Validators.required);
+        }
+        else {
+            phoneControl.clearValidators();
+        }
+        phoneControl.updateValueAndValidity();
+    };
     CustomerComponent = __decorate([
         core_1.Component({
             selector: 'my-signup',
             templateUrl: './app/customers/customer.component.html'
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [forms_1.FormBuilder])
     ], CustomerComponent);
     return CustomerComponent;
 }());
