@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
+// import { FormsModule } from '@angular/forms';
 var forms_1 = require('@angular/forms');
 var app_component_1 = require('./app.component');
 var customer_component_1 = require('./customers/customer.component');
@@ -20,7 +21,8 @@ var AppModule = (function () {
         core_1.NgModule({
             imports: [
                 platform_browser_1.BrowserModule,
-                forms_1.FormsModule
+                // FormsModule
+                forms_1.ReactiveFormsModule
             ],
             declarations: [
                 app_component_1.AppComponent,

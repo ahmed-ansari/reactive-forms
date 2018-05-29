@@ -9,14 +9,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+// import { NgForm } from '@angular/forms';
+var forms_1 = require('@angular/forms');
 var customer_1 = require('./customer');
 var CustomerComponent = (function () {
     function CustomerComponent() {
         this.customer = new customer_1.Customer();
     }
-    CustomerComponent.prototype.save = function (customerForm) {
-        console.log(customerForm.form);
-        console.log('Saved: ' + JSON.stringify(customerForm.value));
+    CustomerComponent.prototype.ngOnInit = function () {
+        this.customerForm = new forms_1.FormGroup({
+            firstName: new forms_1.FormControl(),
+            lastName: new forms_1.FormControl(),
+            email: new forms_1.FormControl(),
+            sendCatalog: new forms_1.FormControl(true),
+        });
+    };
+    // save(customerForm: NgForm) {
+    CustomerComponent.prototype.save = function () {
+        console.log(this.customer);
+        console.log(this.customerForm);
+        console.log('Saved: ' + JSON.stringify(this.customerForm.value));
+    };
+    CustomerComponent.prototype.testData = function () {
+        // this.customerForm.setValue({
+        //     firstName:"Ansari",
+        //     lastName:"Ahmed",
+        //     sendCatalog:true,
+        //     email:"ansari@gmail.com"
+        // })
+        this.customerForm.patchValue({
+            firstName: "Ansari",
+            // lastName:"Ahmed",
+            sendCatalog: true,
+            email: "ansari@gmail.com"
+        });
     };
     CustomerComponent = __decorate([
         core_1.Component({
